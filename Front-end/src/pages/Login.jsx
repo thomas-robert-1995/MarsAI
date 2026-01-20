@@ -1,9 +1,29 @@
-import { useState } from "react";
+import { use, useState } from "react";
 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email obligatoire";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Mot de passe obligatoire"
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
 
   return (
     <div className="auth-container">
