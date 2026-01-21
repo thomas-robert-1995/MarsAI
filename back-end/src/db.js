@@ -1,7 +1,7 @@
 import mysql from "mysql2/promise";
 
 // Create a shared MySQL connection poo
-// Connection parameters are read from environment variables
+// Connection parameters are read from .env variables  
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,      
