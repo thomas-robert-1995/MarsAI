@@ -11,7 +11,7 @@ const router = Router();
  */
 router.get(
   "/admin/users",
-  authenticateToken, // déjà prêt
+  authenticateToken,
   getAllUsers
 );
 
