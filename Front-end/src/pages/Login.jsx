@@ -79,10 +79,10 @@ export default function Login() {
         </div>
 
         {/* Right side - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#FBF5F0]">
-          <div className="w-full max-w-md px-4">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-8 lg:p-12 bg-[#FBF5F0]">
+          <div className="w-full max-w-xl px-4 md:px-6">
             {/* Tab Toggle */}
-            <div className="flex bg-white rounded-full p-1 mb-8 border border-[#463699]">
+            <div className="flex bg-white rounded-full p-1 mb-8 border border-[#463699] text-base">
               <div className="flex-1 text-center py-2 px-4 rounded-full text-sm font-medium bg-[#463699] text-white">
                 Se connecter
               </div>
@@ -95,15 +95,15 @@ export default function Login() {
             </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-[#262335] mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#262335] mb-8">
             Se connecter
           </h1>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-[#262335] mb-1">
+              <label className="block text-sm md:text-base font-medium text-[#262335] mb-2">
                 Email
               </label>
               <input
@@ -111,7 +111,7 @@ export default function Login() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-white border border-[#C7C2CE] rounded-md focus:outline-none focus:border-[#463699] text-[#262335]"
+                className="w-full px-4 py-3 bg-white border border-[#C7C2CE] rounded-md focus:outline-none focus:border-[#463699] text-[#262335] text-base"
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -120,7 +120,7 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-[#262335] mb-1">
+              <label className="block text-sm md:text-base font-medium text-[#262335] mb-2">
                 Mot de passe
               </label>
               <input
@@ -128,7 +128,7 @@ export default function Login() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-white border border-[#C7C2CE] rounded-md focus:outline-none focus:border-[#463699] text-[#262335]"
+                className="w-full px-4 py-3 bg-white border border-[#C7C2CE] rounded-md focus:outline-none focus:border-[#463699] text-[#262335] text-base"
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -154,7 +154,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#262335] text-white py-3 rounded-md font-semibold hover:bg-[#463699] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              className="w-full bg-[#262335] text-white py-3.5 rounded-md font-semibold hover:bg-[#463699] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6 text-base md:text-lg"
             >
               {loading ? "Connexion..." : "Connexion"}
             </button>
