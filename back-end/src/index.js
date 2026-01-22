@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import adminRoutes from "./routes/admin.routes.js";
+import juryRoutes from "./routes/jury.routes.js";
+import directorRoutes from "./routes/director.routes.js";
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import { testConnection } from "./config/database.js";
@@ -29,8 +31,8 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api", healthRoutes);
 app.use("/api/auth", authRoutes);
-            // app.use("/api/director", directorRoutes); ///WIP 
-            // app.use("/api/jury", juryRoutes);        ///WIP
+app.use("/api/director", directorRoutes);
+app.use("/api/jury", juryRoutes);
 app.use("/api/admin", adminRoutes);
 
 const port = Number(process.env.PORT) || 5000;
