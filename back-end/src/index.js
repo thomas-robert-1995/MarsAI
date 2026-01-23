@@ -11,16 +11,15 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
-
-app.use("/api", adminRoutes);
-
+// CORS must be first!
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "*",
     credentials: true,
   })
 );
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({ message: "MarsAI API online 🚀" });
@@ -29,6 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
+app.use("/api", adminRoutes);
 
 const port = Number(process.env.PORT) || 5000;
 
