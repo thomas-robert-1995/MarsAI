@@ -19,6 +19,7 @@ export default class Film {
         country,
         description,
         film_url,
+        youtube_url,
         poster_url,
         thumbnail_url,
         ai_tools_used,
@@ -40,7 +41,7 @@ export default class Film {
       VALUES (
         ?, ?, ?,
         ?, ?, ?,
-        ?, ?,
+        ?, ?, ?,
 
         ?, ?, ?,
         ?, ?, ?,
@@ -56,6 +57,7 @@ export default class Film {
       data.country,
       data.description,
       data.film_url,
+      data.youtube_url || null,
       data.poster_url,
       data.thumbnail_url,
 
@@ -90,7 +92,7 @@ export default class Film {
 
   static async findAllPending() {
     const sql = `
-      SELECT id, title, country, description, film_url, poster_url, thumbnail_url,
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
              director_firstname, director_lastname, director_email, director_bio,
              ai_tools_used, ai_certification, status, created_at
       FROM films
@@ -103,7 +105,7 @@ export default class Film {
 
   static async findApproved() {
     const sql = `
-      SELECT id, title, country, description, film_url, poster_url, thumbnail_url,
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
              director_firstname, director_lastname, director_bio,
              ai_tools_used, ai_certification, status, created_at
       FROM films
@@ -112,6 +114,63 @@ export default class Film {
     `;
     const [rows] = await db.query(sql);
     return rows;
+  }
+
+  /**
+   * Get approved films for public catalog (with YouTube URLs)
+   * Returns only public-safe information
+   */
+  static async findForPublicCatalog() {
+    const sql = `
+      SELECT
+        id,
+        title,
+        country,
+        description,
+        youtube_url,
+        poster_url,
+        thumbnail_url,
+        director_firstname,
+        director_lastname,
+        director_bio,
+        ai_tools_used,
+        created_at
+      FROM films
+      WHERE status = 'approved'
+      ORDER BY created_at DESC
+    `;
+    const [rows] = await db.query(sql);
+    return rows;
+  }
+
+  /**
+   * Get a single film for public viewing
+   */
+  static async findForPublicView(id) {
+    const sql = `
+      SELECT
+        id,
+        title,
+        country,
+        description,
+        youtube_url,
+        poster_url,
+        thumbnail_url,
+        director_firstname,
+        director_lastname,
+        director_bio,
+        director_school,
+        director_website,
+        social_instagram,
+        social_youtube,
+        social_vimeo,
+        ai_tools_used,
+        created_at
+      FROM films
+      WHERE id = ? AND status = 'approved'
+    `;
+    const [rows] = await db.query(sql, [id]);
+    return rows[0] || null;
   }
 
   static async updateStatus(id, status, rejectionReason = null) {
@@ -124,9 +183,22 @@ export default class Film {
     return result.affectedRows > 0;
   }
 
+  /**
+   * Update YouTube URL for a film (Admin only)
+   */
+  static async updateYouTubeUrl(id, youtubeUrl) {
+    const sql = `
+      UPDATE films
+      SET youtube_url = ?, updated_at = NOW()
+      WHERE id = ?
+    `;
+    const [result] = await db.query(sql, [youtubeUrl, id]);
+    return result.affectedRows > 0;
+  }
+
   static async findAll() {
     const sql = `
-      SELECT id, title, country, description, film_url, poster_url, thumbnail_url,
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
              director_firstname, director_lastname, director_email, director_bio,
              ai_tools_used, ai_certification, status, created_at
       FROM films

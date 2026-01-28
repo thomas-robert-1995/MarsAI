@@ -9,6 +9,9 @@ import {
   getApprovedFilms,
   updateFilmStatus,
   getAllFilms,
+  getPublicCatalog,
+  getPublicFilm,
+  updateYouTubeUrl,
 } from "../controllers/film.controller.js";
 import { authenticateToken } from "../middleware/auth.middleware.js";
 import { authorize } from "../middleware/authorize.middleware.js";
@@ -90,6 +93,12 @@ router.post(
 // Get approved films for catalog (public)
 router.get("/catalog", getApprovedFilms);
 
+// Public catalog with YouTube URLs (no auth required)
+router.get("/public/catalog", getPublicCatalog);
+
+// Get single film for public viewing (no auth required)
+router.get("/public/:id", getPublicFilm);
+
 // ============ ADMIN ROUTES ============
 
 // Get all pending films (Admin only)
@@ -100,5 +109,8 @@ router.get("/all", authenticateToken, authorize([2]), getAllFilms);
 
 // Update film status (Admin only)
 router.patch("/:id/status", authenticateToken, authorize([2]), updateFilmStatus);
+
+// Update YouTube URL (Admin only)
+router.patch("/:id/youtube", authenticateToken, authorize([2]), updateYouTubeUrl);
 
 export default router;

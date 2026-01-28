@@ -112,7 +112,7 @@ export const createFilm = async (req, res) => {
       country,
       description,
       film_url: filmUrl,
-      youtube_link: null,
+      youtube_url: null,
       poster_url: posterUrl,
       thumbnail_url: thumbnailUrl,
       ai_tools_used: ai_tools_used || null,
@@ -235,6 +235,100 @@ export const getAllFilms = async (req, res) => {
     });
   } catch (err) {
     console.error("getAllFilms error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ============ PUBLIC ROUTES ============
+
+/**
+ * Get public catalog of approved films (Public - No auth required)
+ * Returns films with YouTube URLs for public viewing
+ */
+export const getPublicCatalog = async (req, res) => {
+  try {
+    const films = await Film.findForPublicCatalog();
+    return res.status(200).json({
+      success: true,
+      data: films,
+    });
+  } catch (err) {
+    console.error("getPublicCatalog error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/**
+ * Get single film for public viewing (Public - No auth required)
+ * Returns film with YouTube URL and director info
+ */
+export const getPublicFilm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const film = await Film.findForPublicView(id);
+
+    if (!film) {
+      return res.status(404).json({
+        success: false,
+        message: "Film not found or not approved",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: film,
+    });
+  } catch (err) {
+    console.error("getPublicFilm error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ============ ADMIN ROUTES ============
+
+/**
+ * Update YouTube URL for a film (Admin only)
+ */
+export const updateYouTubeUrl = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { youtube_url } = req.body;
+
+    const film = await Film.findById(id);
+    if (!film) {
+      return res.status(404).json({
+        success: false,
+        message: "Film not found",
+      });
+    }
+
+    // Validate YouTube URL format if provided
+    if (youtube_url) {
+      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+      if (!youtubeRegex.test(youtube_url)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid YouTube URL format",
+        });
+      }
+    }
+
+    const updated = await Film.updateYouTubeUrl(id, youtube_url || null);
+
+    if (!updated) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update YouTube URL",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "YouTube URL updated",
+      data: { id, youtube_url },
+    });
+  } catch (err) {
+    console.error("updateYouTubeUrl error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
