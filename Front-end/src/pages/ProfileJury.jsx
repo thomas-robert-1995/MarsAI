@@ -3,6 +3,125 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+// Helper function to extract YouTube video ID
+const getYouTubeVideoId = (url) => {
+  if (!url) return null;
+
+  // Match various YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/v\/([^&\n?#]+)/,
+    /youtube\.com\/shorts\/([^&\n?#]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return null;
+};
+
+// YouTube Player Component
+const YouTubePlayer = ({ url, title }) => {
+  const videoId = getYouTubeVideoId(url);
+
+  if (!videoId) {
+    return (
+      <div className="aspect-video bg-gray-900 rounded-xl flex items-center justify-center">
+        <p className="text-gray-500">Video non disponible</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="aspect-video rounded-xl overflow-hidden">
+      <iframe
+        width="100%"
+        height="100%"
+        src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+        title={title}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        className="w-full h-full"
+      />
+    </div>
+  );
+};
+
+// Video Player Component (supports both YouTube and local files)
+const VideoPlayer = ({ film }) => {
+  const [showVideo, setShowVideo] = useState(false);
+
+  const youtubeId = getYouTubeVideoId(film.film_url);
+  const isYouTube = !!youtubeId;
+  const isLocalVideo = film.film_url && !isYouTube && film.film_url.startsWith("/uploads");
+
+  if (!film.film_url) {
+    return (
+      <div className="aspect-video bg-gray-900 rounded-xl flex items-center justify-center mb-6">
+        <p className="text-gray-500">Aucune video disponible</p>
+      </div>
+    );
+  }
+
+  if (!showVideo) {
+    return (
+      <div
+        className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden mb-6 cursor-pointer group"
+        onClick={() => setShowVideo(true)}
+      >
+        <img
+          src={film.thumbnail_url ? `http://localhost:5000${film.thumbnail_url}` : film.poster_url ? `http://localhost:5000${film.poster_url}` : "/placeholder.jpg"}
+          alt={film.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all">
+          <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+            <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+        {isYouTube && (
+          <div className="absolute bottom-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+            YouTube
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (isYouTube) {
+    return (
+      <div className="mb-6">
+        <YouTubePlayer url={film.film_url} title={film.title} />
+      </div>
+    );
+  }
+
+  if (isLocalVideo) {
+    return (
+      <div className="aspect-video rounded-xl overflow-hidden mb-6">
+        <video
+          src={`http://localhost:5000${film.film_url}`}
+          controls
+          autoPlay
+          className="w-full h-full"
+        >
+          Votre navigateur ne supporte pas la lecture video.
+        </video>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 // Star Rating Component
 const StarRating = ({ rating, onRate, size = "md", readonly = false }) => {
   const [hovered, setHovered] = useState(0);
@@ -130,24 +249,22 @@ const FilmModal = ({ film, onClose, onRate, userRating }) => {
         className="bg-[#1a1a2e] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Poster Background */}
-        <div className="relative h-64 md:h-80">
-          <img
-            src={film.thumbnail_url ? `http://localhost:5000${film.thumbnail_url}` : film.poster_url ? `http://localhost:5000${film.poster_url}` : "/placeholder.jpg"}
-            alt={film.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-transparent to-transparent" />
+        {/* Close Button */}
+        <div className="sticky top-0 z-10 flex justify-end p-4">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
+            className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
           >
             ✕
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 -mt-20 relative">
+        <div className="px-6 pb-6 -mt-10">
+          {/* Video Player */}
+          <VideoPlayer film={film} />
+
+          {/* Title and Director */}
           <h2 className="text-3xl font-black text-white mb-2">{film.title}</h2>
           <p className="text-gray-400 mb-4">
             {film.director_firstname} {film.director_lastname} • {film.country}
