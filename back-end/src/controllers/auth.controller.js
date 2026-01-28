@@ -107,7 +107,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: { user: userWithoutPassword, token },
+      data: { user: { ...userWithoutPassword, roles }, token },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -130,9 +130,12 @@ export const getProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    const rolesRaw = await User.getRoleIds(userId);
+    const roles = normalizeRoleIds(rolesRaw);
+
     const { password: _password, ...userWithoutPassword } = user;
 
-    return res.status(200).json({ success: true, data: userWithoutPassword });
+    return res.status(200).json({ success: true, data: { ...userWithoutPassword, roles } });
   } catch (error) {
     console.error("Get profile error:", error);
     return res.status(500).json({ success: false, message: "Error retrieving profile" });
@@ -173,9 +176,9 @@ export const sendInvitation = async (req, res) => {
     // Create invitation token
     const token = uuidv4();
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
-    const invitation = await Invitation.create({
+    await Invitation.create({
       email,
       role_id,
       token,
@@ -193,7 +196,7 @@ export const sendInvitation = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Invitation envoyee avec succes",
-      data: { email, role_id },
+      data: { email, role_id, token },
     });
   } catch (error) {
     console.error("Send invitation error:", error);
@@ -348,7 +351,7 @@ export const acceptInvitation = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Compte cree avec succes",
-      data: { user: userWithoutPassword, token: jwtToken },
+      data: { user: { ...userWithoutPassword, roles }, token: jwtToken },
     });
   } catch (error) {
     console.error("Accept invitation error:", error);

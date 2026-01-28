@@ -80,7 +80,7 @@ export default function AcceptInvitation() {
       if (roles.includes(2)) {
         navigate("/profile-admin");
       } else if (roles.includes(3)) {
-        navigate("/profile-super-jury");
+        navigate("/profile-jury");
       } else {
         navigate("/profile-jury");
       }
@@ -128,9 +128,7 @@ export default function AcceptInvitation() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-[#262335] mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-bold text-[#262335] mb-2">Email</label>
             <input
               type="email"
               value={invitation?.email || ""}
@@ -140,9 +138,7 @@ export default function AcceptInvitation() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#262335] mb-2">
-              Votre nom complet
-            </label>
+            <label className="block text-sm font-bold text-[#262335] mb-2">Votre nom complet</label>
             <input
               type="text"
               value={formData.name}
@@ -154,9 +150,7 @@ export default function AcceptInvitation() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#262335] mb-2">
-              Mot de passe
-            </label>
+            <label className="block text-sm font-bold text-[#262335] mb-2">Mot de passe</label>
             <input
               type="password"
               value={formData.password}
@@ -169,9 +163,7 @@ export default function AcceptInvitation() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#262335] mb-2">
-              Confirmer le mot de passe
-            </label>
+            <label className="block text-sm font-bold text-[#262335] mb-2">Confirmer le mot de passe</label>
             <input
               type="password"
               value={formData.confirmPassword}

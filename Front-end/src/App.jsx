@@ -15,6 +15,7 @@ import Regulation from "./pages/Regulations.jsx";
 import Submissions from "./pages/Submissions.jsx";
 import AcceptInvitation from "./pages/AcceptInvitation.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import AcceptInvitation from "./pages/AcceptInvitation.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem("token");

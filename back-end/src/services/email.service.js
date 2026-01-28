@@ -26,11 +26,11 @@ export const sendInvitationEmail = async (email, token, roleName) => {
   const inviteUrl = `${frontendUrl}/invite/${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.EMAIL_USER || "noreply@marsai.com",
     to: email,
     subject: "Invitation au Festival MarsAI",
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #463699;">Bienvenue sur MarsAI!</h1>
         <p>Vous avez ete invite a rejoindre le Festival MarsAI en tant que <strong>${roleName}</strong>.</p>
         <p>Cliquez sur le bouton ci-dessous pour creer votre compte:</p>
@@ -44,8 +44,13 @@ export const sendInvitationEmail = async (email, token, roleName) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    await logEmail(email, mailOptions.subject, "invitation", "sent");
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      await transporter.sendMail(mailOptions);
+      await logEmail(email, mailOptions.subject, "invitation", "sent");
+    } else {
+      console.log("Email not configured. Invitation URL:", inviteUrl);
+      await logEmail(email, mailOptions.subject, "invitation", "skipped", "Email not configured");
+    }
     return true;
   } catch (error) {
     console.error("Send invitation email error:", error);
@@ -59,7 +64,7 @@ export const sendFilmStatusEmail = async (email, filmTitle, status, reason = nul
   const subject = `Votre film "${filmTitle}" a ete ${statusText}`;
 
   let html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h1 style="color: #463699;">MarsAI Festival</h1>
       <p>Bonjour,</p>
       <p>Votre film <strong>"${filmTitle}"</strong> a ete <strong>${statusText}</strong>.</p>
@@ -77,19 +82,22 @@ export const sendFilmStatusEmail = async (email, filmTitle, status, reason = nul
   `;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.EMAIL_USER || "noreply@marsai.com",
     to: email,
     subject,
     html,
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    await logEmail(email, subject, "film_status", "sent");
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      await transporter.sendMail(mailOptions);
+      await logEmail(email, subject, "film_status", "sent");
+    } else {
+      console.log("Email not configured. Would send:", subject);
+    }
     return true;
   } catch (error) {
     console.error("Send film status email error:", error);
-    await logEmail(email, subject, "film_status", "failed", error.message);
     return false;
   }
 };
