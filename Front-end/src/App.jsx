@@ -15,7 +15,6 @@ import Regulation from "./pages/Regulations.jsx";
 import Submissions from "./pages/Submissions.jsx";
 import AcceptInvitation from "./pages/AcceptInvitation.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import AcceptInvitation from "./pages/AcceptInvitation.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -40,7 +39,7 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="catalogs" element={<Catalogs />} />
           <Route path="contact" element={<Contact />} />
-          <Route path="details-film" element={<DetailsFilm />} />
+          <Route path="film/:id" element={<DetailsFilm />} />
           <Route path="prize-list" element={<PrizeList />} />
           <Route path="regulation" element={<Regulation />} />
           <Route path="submissions" element={<Submissions />} />
