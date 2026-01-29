@@ -300,6 +300,23 @@ CREATE TABLE `invitations` (
   CONSTRAINT `fk_inv_user` FOREIGN KEY (`invited_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
+-- Test Films with YouTube URLs (for demo/testing)
+-- --------------------------------------------------------
+
+INSERT INTO `films` (`title`, `country`, `description`, `youtube_url`, `poster_url`, `thumbnail_url`, `ai_tools_used`, `director_firstname`, `director_lastname`, `director_email`, `director_bio`, `director_school`, `status`, `created_at`) VALUES
+('Never Gonna Give You Up - AI Remix', 'France', 'Une réinterprétation artistique du classique de Rick Astley, créée entièrement avec des outils d''IA. Ce film explore les thèmes de la persévérance et de l''engagement à travers une esthétique futuriste.', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg', 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg', 'Midjourney, Runway ML, Sora, ElevenLabs', 'Rick', 'Astley', 'rick@example.com', 'Artiste légendaire reconverti dans l''art IA', 'La Plateforme', 'approved', NOW()),
+
+('Big Buck Bunny - Future Edition', 'Pays-Bas', 'Une version futuriste du célèbre court-métrage open source, réimaginée avec des technologies IA pour explorer un monde où la nature et la technologie coexistent harmonieusement.', 'https://www.youtube.com/watch?v=aqz-KE-bpKQ', 'https://img.youtube.com/vi/aqz-KE-bpKQ/maxresdefault.jpg', 'https://img.youtube.com/vi/aqz-KE-bpKQ/mqdefault.jpg', 'Stable Diffusion, Pika Labs, DALL-E 3', 'Blender', 'Foundation', 'blender@example.com', 'Fondation dédiée à l''art open source et IA', 'Blender Institute', 'approved', NOW()),
+
+('Sintel - AI Dreams', 'Allemagne', 'L''histoire émouvante de Sintel et son dragon, revisitée avec une approche IA pour créer des visuels oniriques et une narration immersive sur le thème de la perte et de l''espoir.', 'https://www.youtube.com/watch?v=eRsGyueVLvQ', 'https://img.youtube.com/vi/eRsGyueVLvQ/maxresdefault.jpg', 'https://img.youtube.com/vi/eRsGyueVLvQ/mqdefault.jpg', 'ComfyUI, AnimateDiff, Udio', 'Ton', 'Roosendaal', 'sintel@example.com', 'Pionnier de l''animation 3D open source', 'Blender Institute', 'approved', NOW()),
+
+('Cosmos Laundromat - Tomorrow', 'International', 'Victor le mouton dans une laverie cosmique, une méditation sur l''infini et les choix qui définissent notre existence, créée avec les dernières avancées en IA générative.', 'https://www.youtube.com/watch?v=Y-rmzh0PI3c', 'https://img.youtube.com/vi/Y-rmzh0PI3c/maxresdefault.jpg', 'https://img.youtube.com/vi/Y-rmzh0PI3c/mqdefault.jpg', 'Runway Gen-3, Midjourney v6, Suno AI', 'Mathieu', 'Auvray', 'cosmos@example.com', 'Réalisateur expérimental franco-néerlandais', 'Gobelins', 'approved', NOW()),
+
+('Spring - Nature Awakens', 'Pays-Bas', 'Un berger et son chien font face aux forces de la nature dans ce conte visuel poétique, enrichi par l''IA pour créer des paysages impossibles et des émotions palpables.', 'https://www.youtube.com/watch?v=WhWc3b3KhnY', 'https://img.youtube.com/vi/WhWc3b3KhnY/maxresdefault.jpg', 'https://img.youtube.com/vi/WhWc3b3KhnY/mqdefault.jpg', 'Stable Video Diffusion, Leonardo AI, Kaiber', 'Andy', 'Goralczyk', 'spring@example.com', 'Artiste 3D et directeur créatif', 'Blender Studio', 'approved', NOW()),
+
+('Film en attente de validation', 'France', 'Ce film est en attente de validation par l''équipe d''administration.', 'https://www.youtube.com/watch?v=LXb3EKWsInQ', NULL, NULL, 'ChatGPT, DALL-E', 'Test', 'Pending', 'pending@example.com', 'Réalisateur test', NULL, 'pending', NOW());
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
