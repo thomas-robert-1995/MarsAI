@@ -3,7 +3,16 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import rateLimit from "express-rate-limit";
-import { createFilm } from "../controllers/film.controller.js";
+import {
+  createFilm,
+  getPublicCatalog,
+  getPublicFilm,
+  getPendingFilms,
+  getApprovedFilms,
+  updateFilmStatus,
+} from "../controllers/film.controller.js";
+import { authenticateToken } from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = express.Router();
 
@@ -65,6 +74,9 @@ const upload = multer({
   },
 });
 
+// ============ PUBLIC ROUTES (no auth) ============
+
+// Submit a new film
 router.post(
   "/",
   submitLimiter,
@@ -75,5 +87,22 @@ router.post(
   ]),
   createFilm
 );
+
+// Public catalog (approved films only)
+router.get("/public/catalog", getPublicCatalog);
+
+// Public film detail (approved films only)
+router.get("/public/:id", getPublicFilm);
+
+// ============ ADMIN ROUTES ============
+
+// Get pending films (Admin only)
+router.get("/pending", authenticateToken, authorize([2]), getPendingFilms);
+
+// Get approved films (Admin only)
+router.get("/approved", authenticateToken, authorize([2]), getApprovedFilms);
+
+// Update film status (Admin only)
+router.patch("/:id/status", authenticateToken, authorize([2]), updateFilmStatus);
 
 export default router;

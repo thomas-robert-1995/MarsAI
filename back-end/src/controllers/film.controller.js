@@ -63,6 +63,25 @@ export const createFilm = async (req, res) => {
       });
     }
 
+    // Handle ai_certification: can be true, "true", 1, "1"
+    const isAiCert =
+      ai_certification === true ||
+      ai_certification === 1 ||
+      String(ai_certification).toLowerCase() === "true" ||
+      String(ai_certification) === "1";
+
+    // AI certification is required
+    if (!isAiCert) {
+      safeUnlink(posterFile);
+      safeUnlink(filmFile);
+      safeUnlink(thumbnailFile);
+
+      return res.status(400).json({
+        success: false,
+        message: "La certification IA est obligatoire. Veuillez cocher la case.",
+      });
+    }
+
     const tooLong =
       title.length > MAX_TITLE ||
       country.length > MAX_COUNTRY ||
@@ -105,14 +124,12 @@ export const createFilm = async (req, res) => {
     const posterUrl = `/uploads/posters/${posterFile.filename}`;
     const thumbnailUrl = thumbnailFile ? `/uploads/thumbnails/${thumbnailFile.filename}` : null;
 
-    const isAiCert = String(ai_certification).toLowerCase() === "true" || ai_certification === true;
-
     const created = await Film.create({
       title,
       country,
       description,
       film_url: filmUrl,
-      youtube_link: null,
+      youtube_url: null,
       poster_url: posterUrl,
       thumbnail_url: thumbnailUrl,
       ai_tools_used: ai_tools_used || null,
@@ -144,6 +161,94 @@ export const createFilm = async (req, res) => {
     safeUnlink(filmFile);
     safeUnlink(thumbnailFile);
 
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ============ PUBLIC ROUTES (no auth) ============
+
+export const getPublicCatalog = async (req, res) => {
+  try {
+    const films = await Film.findForPublicCatalog();
+    return res.status(200).json({ success: true, data: films });
+  } catch (err) {
+    console.error("getPublicCatalog error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getPublicFilm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const film = await Film.findForPublicView(id);
+
+    if (!film) {
+      return res.status(404).json({
+        success: false,
+        message: "Film not found or not approved",
+      });
+    }
+
+    return res.status(200).json({ success: true, data: film });
+  } catch (err) {
+    console.error("getPublicFilm error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ============ ADMIN ROUTES ============
+
+export const getPendingFilms = async (req, res) => {
+  try {
+    const films = await Film.findAllPending();
+    return res.status(200).json({ success: true, data: films });
+  } catch (err) {
+    console.error("getPendingFilms error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getApprovedFilms = async (req, res) => {
+  try {
+    const films = await Film.findAllApproved();
+    return res.status(200).json({ success: true, data: films });
+  } catch (err) {
+    console.error("getApprovedFilms error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const updateFilmStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, rejection_reason } = req.body;
+    const userId = req.user?.userId;
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be 'approved' or 'rejected'",
+      });
+    }
+
+    const film = await Film.findById(id);
+    if (!film) {
+      return res.status(404).json({ success: false, message: "Film not found" });
+    }
+
+    const updated = await Film.updateStatus(id, status, userId, rejection_reason);
+
+    if (!updated) {
+      return res.status(500).json({ success: false, message: "Failed to update" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Film ${status}`,
+      data: { id, status },
+    });
+  } catch (err) {
+    console.error("updateFilmStatus error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };

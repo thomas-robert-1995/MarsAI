@@ -95,6 +95,7 @@ CREATE TABLE `films` (
   `country` varchar(100) DEFAULT NULL,
   `description` text,
   `film_url` varchar(500) DEFAULT NULL COMMENT 'URL to uploaded film file',
+  `youtube_url` varchar(500) DEFAULT NULL COMMENT 'YouTube video URL for public viewing',
   `poster_url` varchar(500) DEFAULT NULL COMMENT 'Main poster image',
   `thumbnail_url` varchar(500) DEFAULT NULL COMMENT 'Small thumbnail for lists',
   `ai_tools_used` text COMMENT 'AI tools used (free text)',
@@ -295,6 +296,19 @@ CREATE TABLE `invitations` (
   CONSTRAINT `fk_inv_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
   CONSTRAINT `fk_inv_user` FOREIGN KEY (`invited_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+-- Test Films with YouTube URLs (for demo/testing)
+-- --------------------------------------------------------
+
+INSERT INTO `films` (`title`, `country`, `description`, `youtube_url`, `poster_url`, `thumbnail_url`, `ai_tools_used`, `ai_certification`, `director_firstname`, `director_lastname`, `director_email`, `director_bio`, `director_school`, `status`, `created_at`) VALUES
+('Never Gonna Give You Up - AI Remix', 'France', 'Une réinterprétation artistique du classique de Rick Astley, créée entièrement avec des outils d''IA.', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg', 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg', 'Midjourney, Runway ML, Sora', 1, 'Rick', 'Astley', 'rick@example.com', 'Artiste légendaire reconverti dans l''art IA', 'La Plateforme', 'approved', NOW()),
+
+('Big Buck Bunny - Future Edition', 'Pays-Bas', 'Une version futuriste du célèbre court-métrage open source, réimaginée avec des technologies IA.', 'https://www.youtube.com/watch?v=aqz-KE-bpKQ', 'https://img.youtube.com/vi/aqz-KE-bpKQ/maxresdefault.jpg', 'https://img.youtube.com/vi/aqz-KE-bpKQ/mqdefault.jpg', 'Stable Diffusion, Pika Labs', 1, 'Blender', 'Foundation', 'blender@example.com', 'Fondation dédiée à l''art open source', 'Blender Institute', 'approved', NOW()),
+
+('Sintel - AI Dreams', 'Allemagne', 'L''histoire émouvante de Sintel et son dragon, revisitée avec une approche IA.', 'https://www.youtube.com/watch?v=eRsGyueVLvQ', 'https://img.youtube.com/vi/eRsGyueVLvQ/maxresdefault.jpg', 'https://img.youtube.com/vi/eRsGyueVLvQ/mqdefault.jpg', 'ComfyUI, AnimateDiff', 1, 'Ton', 'Roosendaal', 'sintel@example.com', 'Pionnier de l''animation 3D open source', 'Blender Institute', 'approved', NOW()),
+
+('Film en attente', 'France', 'Ce film est en attente de validation par l''administration.', 'https://www.youtube.com/watch?v=LXb3EKWsInQ', NULL, NULL, 'ChatGPT, DALL-E', 1, 'Test', 'Pending', 'pending@example.com', 'Réalisateur test', NULL, 'pending', NOW());
 
 COMMIT;
 

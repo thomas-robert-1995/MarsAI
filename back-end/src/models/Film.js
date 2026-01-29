@@ -19,6 +19,7 @@ export default class Film {
         country,
         description,
         film_url,
+        youtube_url,
         poster_url,
         thumbnail_url,
         ai_tools_used,
@@ -39,7 +40,7 @@ export default class Film {
       )
       VALUES (
         ?, ?, ?,
-        ?, ?, ?,
+        ?, ?, ?, ?,
         ?, ?,
 
         ?, ?, ?,
@@ -56,6 +57,7 @@ export default class Film {
       data.country,
       data.description,
       data.film_url,
+      data.youtube_url || null,
       data.poster_url,
       data.thumbnail_url,
 
@@ -80,5 +82,80 @@ export default class Film {
       ...data,
       status: "pending",
     };
+  }
+
+  static async findById(id) {
+    const sql = `
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
+             director_firstname, director_lastname, director_email, director_bio,
+             director_school, director_website, social_instagram, social_youtube, social_vimeo,
+             ai_tools_used, ai_certification, status, created_at
+      FROM films
+      WHERE id = ?
+    `;
+    const [rows] = await db.query(sql, [id]);
+    return rows[0] || null;
+  }
+
+  static async findAllPending() {
+    const sql = `
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
+             director_firstname, director_lastname, director_email, director_bio,
+             ai_tools_used, ai_certification, status, created_at
+      FROM films
+      WHERE status = 'pending'
+      ORDER BY created_at DESC
+    `;
+    const [rows] = await db.query(sql);
+    return rows;
+  }
+
+  static async findAllApproved() {
+    const sql = `
+      SELECT id, title, country, description, film_url, youtube_url, poster_url, thumbnail_url,
+             director_firstname, director_lastname, director_bio,
+             ai_tools_used, ai_certification, status, created_at
+      FROM films
+      WHERE status = 'approved'
+      ORDER BY created_at DESC
+    `;
+    const [rows] = await db.query(sql);
+    return rows;
+  }
+
+  static async updateStatus(id, status, userId, rejectionReason = null) {
+    const sql = `
+      UPDATE films
+      SET status = ?, status_changed_at = NOW(), status_changed_by = ?, rejection_reason = ?
+      WHERE id = ?
+    `;
+    const [result] = await db.query(sql, [status, userId, rejectionReason, id]);
+    return result.affectedRows > 0;
+  }
+
+  // Public methods (no auth required)
+  static async findForPublicCatalog() {
+    const sql = `
+      SELECT id, title, country, description, youtube_url, poster_url, thumbnail_url,
+             director_firstname, director_lastname, director_bio, ai_tools_used, created_at
+      FROM films
+      WHERE status = 'approved'
+      ORDER BY created_at DESC
+    `;
+    const [rows] = await db.query(sql);
+    return rows;
+  }
+
+  static async findForPublicView(id) {
+    const sql = `
+      SELECT id, title, country, description, youtube_url, poster_url, thumbnail_url,
+             director_firstname, director_lastname, director_bio, director_school,
+             director_website, social_instagram, social_youtube, social_vimeo,
+             ai_tools_used, created_at
+      FROM films
+      WHERE id = ? AND status = 'approved'
+    `;
+    const [rows] = await db.query(sql, [id]);
+    return rows[0] || null;
   }
 }
